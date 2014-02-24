@@ -1,22 +1,50 @@
 #include <stdio.h>
-#include <string.h>
-#include <time.h>
-#define URL_LOGIN "https://www.google.com"
-#include "Sample.h"
+#include <termios.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/time.h>
+
+int kbhit (void)
+{
+  struct timeval tv;
+  fd_set rdfs;
+
+  tv.tv_sec = 0;
+  tv.tv_usec = 0;
+
+  FD_ZERO(&rdfs);
+  FD_SET (STDIN_FILENO, &rdfs);
+
+  select(STDIN_FILENO+1, &rdfs, NULL, NULL, &tv);
+  return FD_ISSET(STDIN_FILENO, &rdfs);
+
+}
 int main(void)
 {
-    char buffer[25];
+
+    char buffer[25],c;
     timer_t time_in_long;
     struct tm* tm_info;
     time(&time_in_long);
     tm_info = localtime(&time_in_long);
 
-    strftime(buffer, 25, "%Y:%m:%d - %I:%M:%S %p", tm_info);
-    puts(buffer);
+    while(!kbhit())
+    {
+//        system("clear");
+        sleep(1);
+        time(&time_in_long);
+        tm_info = localtime(&time_in_long);
+        strftime(buffer, 25, "%Y:%m:%d - %I:%M:%S %p", tm_info);
+        puts(buffer);
 
+
+
+    }
     return 0;
 
 }
+
+
 
 /*
 %a	Abbreviated weekday name *											   Thu
